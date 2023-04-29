@@ -12,6 +12,16 @@ public class Product {
     /** can be null if the price is null */
     private Currency currency;
     private int stock;
+
+    public Product(String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
+        this.code = code;
+        this.description = description;
+        this.price = price;
+        this.currency = currency;
+        this.stock = stock;
+        this.imageUrl = imageUrl;
+    }
+
     private String imageUrl;
 
     public Product() {
