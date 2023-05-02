@@ -24,12 +24,12 @@ public class ArrayListProductDaoTest {
     }
 
     @Test
-    public void whenFindProducts_thenReturnListNotEmpty() {
+    public void whenFindProductsThenReturnListNotEmpty() {
         assertFalse(productDao.findProducts().isEmpty());
     }
 
     @Test
-    public void whenFindProducts_thenReturnProductsWithNotNullPrice() {
+    public void whenFindProductsThenReturnProductsWithNotNullPrice() {
         Product productWithNullPrice = new Product("sgs", "Samsung Galaxy S", null, usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(productWithNullPrice);
 
@@ -39,7 +39,7 @@ public class ArrayListProductDaoTest {
     }
 
     @Test
-    public void whenFindProducts_thenReturnProductsWithPositiveStock() {
+    public void whenFindProductsThenReturnProductsWithPositiveStock() {
         Product productWithZeroStock = new Product("sgs", "Samsung Galaxy S", new BigDecimal(2), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(productWithZeroStock);
 
@@ -56,19 +56,19 @@ public class ArrayListProductDaoTest {
     }
 
     @Test(expected = ProductNotFoundException.class)
-    public void givenNull_whenGetProduct_thenThrowProductNotFoundException() {
+    public void givenNullWhenGetProductThenThrowProductNotFoundException() {
         productDao.getProduct(null);
     }
 
     @Test
-    public void givenProductWithNoId_whenSave_thenSaveProductWithId() {
+    public void givenProductWithNoIdWhenSaveThenSaveProductWithId() {
         productDao.save(product);
 
         assertNotNull(product.getId());
     }
 
     @Test
-    public void givenProductWithId_whenSave_thenSaveProductWithSameId() {
+    public void givenProductWithIdWhenSaveThenSaveProductWithSameId() {
         Product productWithId = new Product(222L, "sgs", "Samsung Galaxy S", new BigDecimal(2), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
         productDao.save(productWithId);
 
@@ -76,12 +76,12 @@ public class ArrayListProductDaoTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void givenNull_whenSaveProduct_thenThrowIllegalArgumentException() {
+    public void givenNullWhenSaveProductThenThrowIllegalArgumentException() {
         productDao.save(null);
     }
 
     @Test
-    public void givenProductWithExistingId_whenSaveProduct_thenUpdateProduct() {
+    public void givenProductWithExistingIdWhenSaveProductThenUpdateProduct() {
         String newDescription = "Test Phone";
 
         productDao.save(product);
@@ -92,7 +92,7 @@ public class ArrayListProductDaoTest {
     }
 
     @Test(expected = ProductNotFoundException.class)
-    public void givenId_whenDelete_thenDeleteProduct() {
+    public void givenIdWhenDeleteThenDeleteProduct() {
         productDao.save(product);
 
         productDao.delete(product.getId());
@@ -101,7 +101,7 @@ public class ArrayListProductDaoTest {
     }
 
     @Test
-    public void givenNull_whenDelete_thenDeleteNoElements() {
+    public void givenNullWhenDeleteThenDeleteNoElements() {
         List<Product> products = productDao.findProducts();
 
         productDao.delete(null);
