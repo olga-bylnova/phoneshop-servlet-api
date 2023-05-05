@@ -111,8 +111,7 @@ public class Product {
     }
 
     private void updatePriceHistory(BigDecimal price) {
-        Date date = new Date();
-        this.priceHistory.add(new PriceHistory(date, price));
+        this.priceHistory.add(new PriceHistory(new Date(), price));
     }
 
     @Override

@@ -122,7 +122,6 @@ public class ArrayListProductDaoTest {
     @Test
     public void givenSearchQueryReturnProductListSortedByQueryMatching() {
         productDao.save(new Product("simc61", "Test phone", new BigDecimal(80), usd, 30, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20C61.jpg"));
-
         productDao.save(new Product("sgs3", "Test phone 1 III", new BigDecimal(300), usd, 5, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20III.jpg"));
         productDao.save(new Product("simsxg75", "Phone 1", new BigDecimal(150), usd, 40, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg"));
         productDao.save(new Product("sgs", "Test phone 1", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg"));
