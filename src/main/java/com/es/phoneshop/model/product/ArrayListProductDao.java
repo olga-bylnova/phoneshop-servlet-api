@@ -2,8 +2,10 @@ package com.es.phoneshop.model.product;
 
 import com.es.phoneshop.exception.ProductNotFoundException;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
@@ -88,22 +90,24 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     private Comparator<Product> getSearchKeywordComparator(List<String> searchKeywords) {
-        Comparator<Product> comparatorMatches = Comparator.comparing(product ->
-                searchKeywords.stream()
-                        .filter(keyword -> Arrays.asList(product.getDescription()
+        Comparator<Product> comparator = (p1, p2) -> 0;
+        if (!searchKeywords.isEmpty()) {
+            comparator = Comparator.<Product, Long>comparing(product ->
+                    searchKeywords.stream()
+                        .filter(keyword -> Arrays.asList(product.getDescription().toLowerCase()
                                 .split(" ")).contains(keyword))
-                        .count(), Comparator.reverseOrder());
-        comparatorMatches
-                .thenComparing(product -> {
-                            long matchingWordCount = searchKeywords
-                                    .stream()
-                                    .filter(keyword -> product.getDescription().contains(keyword))
-                                    .count();
-                            long descriptionLength = product.getDescription().split(" ").length;
-                            return (descriptionLength - matchingWordCount);
-                        }
-                );
-        return comparatorMatches;
+                        .count(), Comparator.reverseOrder())
+                    .thenComparing(product -> {
+                                long matchingWordCount = searchKeywords
+                                        .stream()
+                                        .filter(keyword -> product.getDescription().toLowerCase().contains(keyword))
+                                        .count();
+                                long descriptionLength = product.getDescription().split(" ").length;
+                                return (descriptionLength - matchingWordCount);
+                            }
+                    );
+        }
+        return comparator;
     }
 
     @Override
