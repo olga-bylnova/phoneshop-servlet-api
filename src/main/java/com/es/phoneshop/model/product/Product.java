@@ -1,18 +1,23 @@
 package com.es.phoneshop.model.product;
 
 import java.math.BigDecimal;
-import java.util.Currency;
-import java.util.Objects;
+import java.util.*;
 
 public class Product {
     private Long id;
     private String code;
     private String description;
-    /** null means there is no price because the product is outdated or new */
+    /**
+     * null means there is no price because the product is outdated or new
+     */
     private BigDecimal price;
-    /** can be null if the price is null */
+    /**
+     * can be null if the price is null
+     */
     private Currency currency;
     private int stock;
+    private String imageUrl;
+    private List<PriceHistory> priceHistory;
 
     public Product(String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
         this.code = code;
@@ -21,9 +26,9 @@ public class Product {
         this.currency = currency;
         this.stock = stock;
         this.imageUrl = imageUrl;
+        this.priceHistory = new ArrayList<>();
+        updatePriceHistory(price);
     }
-
-    private String imageUrl;
 
     public Product() {
     }
@@ -36,6 +41,8 @@ public class Product {
         this.currency = currency;
         this.stock = stock;
         this.imageUrl = imageUrl;
+        this.priceHistory = new ArrayList<>();
+        updatePriceHistory(price);
     }
 
     public Long getId() {
@@ -68,6 +75,7 @@ public class Product {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+        updatePriceHistory(price);
     }
 
     public Currency getCurrency() {
@@ -92,6 +100,19 @@ public class Product {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public List<PriceHistory> getPriceHistory() {
+        return priceHistory;
+    }
+
+    public void setPriceHistory(List<PriceHistory> priceHistory) {
+        this.priceHistory = priceHistory;
+    }
+
+    private void updatePriceHistory(BigDecimal price) {
+        Date date = new Date();
+        this.priceHistory.add(new PriceHistory(date, price));
     }
 
     @Override
