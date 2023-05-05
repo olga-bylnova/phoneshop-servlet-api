@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class ArrayListProductDao implements ProductDao {
     private static final ProductDao INSTANCE = new ArrayListProductDao();
 
-    public static synchronized ProductDao getInstance() {
+    public static ProductDao getInstance() {
         return INSTANCE;
     }
 
@@ -90,9 +90,9 @@ public class ArrayListProductDao implements ProductDao {
     private Comparator<Product> getSearchKeywordComparator(List<String> searchKeywords) {
         Comparator<Product> comparatorMatches = Comparator.comparing(product ->
                 searchKeywords.stream()
-                .filter(keyword -> Arrays.asList(product.getDescription()
-                        .split(" ")).contains(keyword))
-                .count(), Comparator.reverseOrder());
+                        .filter(keyword -> Arrays.asList(product.getDescription()
+                                .split(" ")).contains(keyword))
+                        .count(), Comparator.reverseOrder());
         comparatorMatches
                 .thenComparing(product -> {
                             long matchingWordCount = searchKeywords
