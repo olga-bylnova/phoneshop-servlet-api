@@ -23,7 +23,7 @@ public class DemoDataServletContextListenerTest {
 
     @Test
     public void testContextInitialized() {
-        String initParameter = "insertDemoDate";
+        String initParameter = "insertDemoData";
 
         when(event.getServletContext()).thenReturn(context);
         when(event.getServletContext().getInitParameter(any())).thenReturn("true");

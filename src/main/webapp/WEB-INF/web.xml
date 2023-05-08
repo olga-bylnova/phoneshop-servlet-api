@@ -6,7 +6,7 @@
   <display-name>Phoneshop servlet api training</display-name>
 
   <context-param>
-    <param-name>insertDemoDate</param-name>
+    <param-name>insertDemoData</param-name>
     <param-value>true</param-value>
   </context-param>
 
