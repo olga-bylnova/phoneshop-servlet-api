@@ -69,8 +69,7 @@ public class ArrayListProductDao implements ProductDao {
         if (query != null) {
             splitQuery = Arrays.stream(query
                             .toLowerCase()
-                            .replaceAll("\\s+", " ")
-                            .split(" "))
+                            .split("\\s+"))
                     .toList();
         }
         return splitQuery;
