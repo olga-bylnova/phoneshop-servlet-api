@@ -67,7 +67,10 @@ public class ArrayListProductDao implements ProductDao {
     private List<String> splitQuery(String query) {
         List<String> splitQuery = new ArrayList<>();
         if (query != null) {
-            splitQuery = Arrays.stream(query.toLowerCase().split(" "))
+            splitQuery = Arrays.stream(query
+                            .toLowerCase()
+                            .replaceAll("\\s+", " ")
+                            .split(" "))
                     .toList();
         }
         return splitQuery;
@@ -93,14 +96,17 @@ public class ArrayListProductDao implements ProductDao {
         Comparator<Product> comparator = (p1, p2) -> 0;
         if (!searchKeywords.isEmpty()) {
             comparator = Comparator.<Product, Long>comparing(product ->
-                    searchKeywords.stream()
-                        .filter(keyword -> Arrays.asList(product.getDescription().toLowerCase()
-                                .split(" ")).contains(keyword))
-                        .count(), Comparator.reverseOrder())
+                            searchKeywords.stream()
+                                    .filter(keyword -> Arrays.asList(product.getDescription()
+                                            .toLowerCase()
+                                            .split(" ")).contains(keyword))
+                                    .count(), Comparator.reverseOrder())
                     .thenComparing(product -> {
                                 long matchingWordCount = searchKeywords
                                         .stream()
-                                        .filter(keyword -> product.getDescription().toLowerCase().contains(keyword))
+                                        .filter(keyword -> product.getDescription()
+                                                .toLowerCase()
+                                                .contains(keyword))
                                         .count();
                                 long descriptionLength = product.getDescription().split(" ").length;
                                 return (descriptionLength - matchingWordCount);
