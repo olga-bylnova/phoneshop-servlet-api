@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<link rel="stylesheet" href="${pageContext.servletContext.contextPath}/styles/productList.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 
 <jsp:useBean id="products" type="java.util.ArrayList" scope="request"/>
 <tags:master pageTitle="Product List">
@@ -67,33 +69,6 @@
             </tr>
         </c:forEach>
     </table>
-
-    <style>
-        #priceHistory {
-            display: none;
-            width: 250px;
-            height: 300px;
-            text-align: center;
-            color: #2b2b2b;
-            border: 1px solid gray;
-            background-color: white;
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            margin: auto;
-        }
-    </style>
 </tags:master>
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-<script>
-    $("[id*=price]").hover(function () {
-            $(this).find('#priceHistory').css('display', 'block')
-        },
-        function () {
-            $(this).find('#priceHistory').css('display', 'none')
-        }
-    );
-</script>
+<script src="${pageContext.servletContext.contextPath}/scripts/priceHistory.js" type="text/javascript"></script>
