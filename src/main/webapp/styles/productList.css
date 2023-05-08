@@ -1,0 +1,15 @@
+#priceHistory {
+    display: none;
+    width: 250px;
+    height: 300px;
+    text-align: center;
+    color: #2b2b2b;
+    border: 1px solid gray;
+    background-color: white;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+}

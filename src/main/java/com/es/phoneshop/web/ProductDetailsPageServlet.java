@@ -2,8 +2,6 @@ package com.es.phoneshop.web;
 
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.ProductDao;
-import com.es.phoneshop.model.product.SortField;
-import com.es.phoneshop.model.product.SortOrder;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -11,9 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Optional;
 
-public class ProductListPageServlet extends HttpServlet {
+public class ProductDetailsPageServlet extends HttpServlet {
     private ProductDao productDao;
 
     @Override
@@ -24,15 +21,9 @@ public class ProductListPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String query = request.getParameter("query");
+        String productId = request.getPathInfo();
+        request.setAttribute("product", productDao.getProduct(Long.valueOf(productId.substring(1))));
 
-        String sortFieldParam = request.getParameter("sort");
-        String sortOrderParam = request.getParameter("order");
-
-        request.setAttribute("products", productDao.findProducts(query,
-                Optional.ofNullable(sortFieldParam).map(SortField::valueOf).orElse(null),
-                Optional.ofNullable(sortOrderParam).map(SortOrder::valueOf).orElse(null)
-        ));
-        request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
     }
 }
