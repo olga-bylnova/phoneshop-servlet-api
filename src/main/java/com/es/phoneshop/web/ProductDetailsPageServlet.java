@@ -4,6 +4,7 @@ import com.es.phoneshop.dao.ArrayListProductDao;
 import com.es.phoneshop.dao.ProductDao;
 import com.es.phoneshop.exception.OutOfStockException;
 import com.es.phoneshop.model.cart.Cart;
+import com.es.phoneshop.model.product.ProductReview;
 import com.es.phoneshop.service.CartService;
 import com.es.phoneshop.service.HttpSessionCartService;
 import com.es.phoneshop.service.HttpSessionProductService;
@@ -34,14 +35,13 @@ public class ProductDetailsPageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long productId = parseProductId(request);
+        ProductReview productReview = productService.getRecentlyReviewedProducts(request);
 
         request.setAttribute("product", productDao.getProduct(productId));
         request.setAttribute("cart", cartService.getCart(request));
-        request.setAttribute("productReview", productService.getRecentlyReviewedProducts(request));
+        request.setAttribute("productReview", productReview);
 
-        productService.updateRecentlyReviewedProducts(productId, request);
-
-        //request.setAttribute("message", request.getSession().getAttribute("message"));
+        productService.updateRecentlyReviewedProducts(productReview.getRecentProducts(), productId, request);
 
         request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
     }

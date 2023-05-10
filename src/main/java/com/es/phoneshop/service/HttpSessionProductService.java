@@ -26,15 +26,14 @@ public class HttpSessionProductService implements ProductService {
     public synchronized ProductReview getRecentlyReviewedProducts(HttpServletRequest request) {
         ProductReview recentProducts = (ProductReview) request.getSession().getAttribute(RECENT_PRODUCTS_SESSION_ATTRIBUTE);
         if (recentProducts == null) {
-            request.getSession().setAttribute(RECENT_PRODUCTS_SESSION_ATTRIBUTE, new ProductReview(new ArrayList<>()));
+            recentProducts = new ProductReview(new ArrayList<>());
+            request.getSession().setAttribute(RECENT_PRODUCTS_SESSION_ATTRIBUTE, recentProducts);
         }
         return recentProducts;
     }
 
     @Override
-    public synchronized void updateRecentlyReviewedProducts(Long productId, HttpServletRequest request) {
-        List<Product> recentProducts = getRecentlyReviewedProducts(request).getRecentProducts();
-
+    public synchronized void updateRecentlyReviewedProducts(List<Product> recentProducts, Long productId, HttpServletRequest request) {
         Product product = productDao.getProduct(productId);
 
         recentProducts.removeIf(product1 -> product1.getId().equals(productId));
