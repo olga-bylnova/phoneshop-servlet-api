@@ -1,13 +1,17 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.exception.ProductNotFoundException;
+import com.es.phoneshop.dao.ProductDao;
+import com.es.phoneshop.exception.OutOfStockException;
+import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.model.product.ProductDao;
+import com.es.phoneshop.model.product.ProductReview;
+import com.es.phoneshop.service.CartService;
+import com.es.phoneshop.service.ProductService;
 import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,10 +19,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductDetailsPageServletTest {
@@ -29,34 +33,64 @@ public class ProductDetailsPageServletTest {
     @Mock
     private RequestDispatcher requestDispatcher;
     @Mock
-    private ServletConfig config;
-    @Mock
     private ProductDao productDao;
+    @Mock
+    private CartService cartService;
+    @Mock
+    private ProductService productService;
     @InjectMocks
     private ProductDetailsPageServlet servlet = new ProductDetailsPageServlet();
+    private static final String validProductId = "\\11";
+
+    @Before
+    public void init() {
+        when(request.getPathInfo()).thenReturn(validProductId);
+
+        when(cartService.getCart(any())).thenReturn(new Cart());
+        when(productService.getRecentlyReviewedProducts(any())).thenReturn(new ProductReview());
+        when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
+        when(request.getLocale()).thenReturn(Locale.US);
+    }
 
     @Test
     public void testDoGet() throws ServletException, IOException {
-        String productId = "\\11";
-
-        when(request.getPathInfo()).thenReturn(productId);
+        when(request.getPathInfo()).thenReturn(validProductId);
         when(productDao.getProduct(any())).thenReturn(new Product());
-        when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
 
         servlet.doGet(request, response);
 
         verify(request).setAttribute(eq("product"), any());
+        verify(request).setAttribute(eq("cart"), any());
+        verify(request).setAttribute(eq("productReview"), any());
         verify(request).getRequestDispatcher(eq("/WEB-INF/pages/product.jsp"));
         verify(requestDispatcher).forward(request, response);
     }
+    @Test
+    public void testDoPostWhenValidParameters() throws ServletException, IOException {
+        when(request.getParameter("quantity")).thenReturn("1");
 
-    @Test(expected = ProductNotFoundException.class)
-    public void givenProductIdWhenDoGetThrowProductNotFoundException() throws ServletException, IOException {
-        String productId = "\\11";
+        servlet.doPost(request, response);
 
-        servlet.init(config);
-        when(request.getPathInfo()).thenReturn(productId);
+        verify(request).getParameter("quantity");
+       // verify(request).setAttribute();
+    }
 
-        servlet.doGet(request, response);
+    @Test
+    public void testDoPostWhenQuantityNotANumber() throws ServletException, IOException {
+        when(request.getParameter("quantity")).thenReturn("sdf");
+
+        servlet.doPost(request, response);
+
+        verify(request).setAttribute(eq("error"), any());
+    }
+
+    @Test
+    public void testDoPostWhenProductOutOfStock() throws ServletException, IOException, OutOfStockException {
+        when(request.getParameter("quantity")).thenReturn("1");
+        doThrow(new OutOfStockException(new Product(), 0, 0)).when(cartService).add(any(), anyLong(), anyInt());
+
+        servlet.doPost(request, response);
+
+        verify(request).setAttribute(eq("error"), any());
     }
 }
