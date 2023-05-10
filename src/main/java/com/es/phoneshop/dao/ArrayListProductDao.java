@@ -1,6 +1,9 @@
-package com.es.phoneshop.model.product;
+package com.es.phoneshop.dao;
 
 import com.es.phoneshop.exception.ProductNotFoundException;
+import com.es.phoneshop.model.product.Product;
+import com.es.phoneshop.model.product.SortField;
+import com.es.phoneshop.model.product.SortOrder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
