@@ -53,4 +53,5 @@
         </table>
         <button>Add to cart</button>
     </form>
+    <tags:productReview productReview="${productReview}"/>
 </tags:master>

@@ -17,11 +17,13 @@ import java.util.Optional;
 
 public class ProductListPageServlet extends HttpServlet {
     private ProductDao productDao;
+    private ProductService productService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         productDao = ArrayListProductDao.getInstance();
+        productService = HttpSessionProductService.getInstance();
     }
 
     @Override
@@ -35,6 +37,7 @@ public class ProductListPageServlet extends HttpServlet {
                 Optional.ofNullable(sortFieldParam).map(SortField::valueOf).orElse(null),
                 Optional.ofNullable(sortOrderParam).map(SortOrder::valueOf).orElse(null)
         ));
+        request.setAttribute("productReview", productService.getRecentlyReviewedProducts(request));
         request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);
     }
 }

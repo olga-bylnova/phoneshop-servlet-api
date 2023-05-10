@@ -21,12 +21,14 @@ import java.text.ParseException;
 public class ProductDetailsPageServlet extends HttpServlet {
     private ProductDao productDao;
     private CartService cartService;
+    private ProductService productService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         productDao = ArrayListProductDao.getInstance();
         cartService = HttpSessionCartService.getInstance();
+        productService = HttpSessionProductService.getInstance();
     }
 
     @Override
@@ -35,6 +37,11 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
         request.setAttribute("product", productDao.getProduct(productId));
         request.setAttribute("cart", cartService.getCart(request));
+        request.setAttribute("productReview", productService.getRecentlyReviewedProducts(request));
+
+        productService.updateRecentlyReviewedProducts(productId, request);
+
+        //request.setAttribute("message", request.getSession().getAttribute("message"));
 
         request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
     }
