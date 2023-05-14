@@ -69,6 +69,7 @@
             </tr>
         </c:forEach>
     </table>
+    <tags:productReview productReview="${productReview}"/>
 </tags:master>
 
 <script src="${pageContext.servletContext.contextPath}/scripts/priceHistory.js" type="text/javascript"></script>
