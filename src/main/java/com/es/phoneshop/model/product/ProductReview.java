@@ -1,5 +1,6 @@
 package com.es.phoneshop.model.product;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class ProductReview {

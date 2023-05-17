@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Optional;
-
 public class ProductListPageServlet extends HttpServlet {
     private ProductDao productDao;
     private ProductService productService;
