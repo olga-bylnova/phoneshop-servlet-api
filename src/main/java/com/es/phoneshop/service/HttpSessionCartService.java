@@ -69,6 +69,13 @@ public class HttpSessionCartService implements CartService {
         }
     }
 
+    @Override
+    public synchronized void delete(Cart cart, Long productId) {
+        cart.getItems().removeIf(item ->
+                productId.equals(item.getProduct().getId())
+        );
+    }
+
     private void checkStockAvailable(Product product, int quantity) throws OutOfStockException {
         if (product.getStock() < quantity) {
             throw new OutOfStockException(product, quantity, product.getStock());
@@ -76,13 +83,10 @@ public class HttpSessionCartService implements CartService {
     }
 
     private Optional<CartItem> findCartItemForUpdate(Cart cart, Long productId, int quantity) throws OutOfStockException {
-        Product product = productDao.getProduct(productId);
-
         List<CartItem> items = cart.getItems();
-        Optional<CartItem> itemOptional = items.stream()
+
+        return items.stream()
                 .filter(item -> productId.equals(item.getProduct().getId()))
                 .findAny();
-
-        return itemOptional;
     }
 }
