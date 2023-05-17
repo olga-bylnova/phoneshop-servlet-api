@@ -8,8 +8,10 @@ import com.es.phoneshop.model.cart.CartItem;
 import com.es.phoneshop.model.product.Product;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class HttpSessionCartService implements CartService {
     private static final String CART_SESSION_ATTRIBUTE = HttpSessionCartService.class.getName() + ".cart";
@@ -50,6 +52,7 @@ public class HttpSessionCartService implements CartService {
         } else {
             cart.getItems().add(new CartItem(product, quantity));
         }
+        recalculateCart(cart);
     }
 
     @Override
@@ -67,6 +70,7 @@ public class HttpSessionCartService implements CartService {
         } else {
             cart.getItems().add(new CartItem(product, quantity));
         }
+        recalculateCart(cart);
     }
 
     @Override
@@ -74,6 +78,7 @@ public class HttpSessionCartService implements CartService {
         cart.getItems().removeIf(item ->
                 productId.equals(item.getProduct().getId())
         );
+        recalculateCart(cart);
     }
 
     private void checkStockAvailable(Product product, int quantity) throws OutOfStockException {
@@ -88,5 +93,22 @@ public class HttpSessionCartService implements CartService {
         return items.stream()
                 .filter(item -> productId.equals(item.getProduct().getId()))
                 .findAny();
+    }
+
+    private void recalculateCart(Cart cart) {
+        cart.setTotalQuantity(cart.getItems()
+                .stream()
+                .map(CartItem::getQuantity)
+                .mapToInt(q -> q)
+                .sum());
+
+        BigDecimal totalCost = BigDecimal.ZERO;
+        for (CartItem item : cart.getItems()) {
+            BigDecimal price = item.getProduct().getPrice();
+            int quantity = item.getQuantity();
+
+            totalCost = totalCost.add(price.multiply(BigDecimal.valueOf(quantity)));
+        }
+        cart.setTotalCost(totalCost);
     }
 }
