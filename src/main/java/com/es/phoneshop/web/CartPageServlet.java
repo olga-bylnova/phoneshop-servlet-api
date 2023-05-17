@@ -18,6 +18,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CartPageServlet extends HttpServlet {
     private static final String CART_JSP = "/WEB-INF/pages/cart.jsp";
@@ -46,29 +48,34 @@ public class CartPageServlet extends HttpServlet {
         String[] productIds = request.getParameterValues("productId");
         String[] quantities = request.getParameterValues("quantity");
 
+        Map<Long, String> errors = new HashMap<>();
         for (int i = 0; i < productIds.length; i++) {
             Long productId = Long.valueOf(productIds[i]);
 
             int quantity;
             try {
                 quantity = getQuantity(request, quantities[i]);
-            } catch (ParseException e) {
-                request.setAttribute("error", "Not a number");
-                doGet(request, response);
-                return;
-            }
-
-            try {
-                cartService.add(cartService.getCart(request), productId, quantity);
-            } catch (OutOfStockException e) {
-                request.setAttribute("error", "Product out of stock, available " + e.getStockAvailable());
-                doGet(request, response);
-                return;
+                cartService.update(cartService.getCart(request), productId, quantity);
+            } catch (ParseException | OutOfStockException e) {
+                handleError(errors, productId, e);
+                errors.put(productId, "Not a number");
             }
         }
-        //response.sendRedirect(request.getContextPath() + "/products/" + productId);
-        request.setAttribute("message", "Product added to cart");
-        doGet(request, response);
+
+        if (errors.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/cart?message=Cart updated successfully");
+        } else {
+            request.setAttribute("errors", errors);
+            doGet(request, response);
+        }
+    }
+
+    private void handleError(Map<Long, String> errors, Long productId, Exception e) {
+        if (e.getClass().equals(ParseException.class)) {
+            errors.put(productId, "Not a number");
+        } else {
+            errors.put(productId, "Out of stock, max available " + ((OutOfStockException) e).getStockAvailable());
+        }
     }
 
     private Long parseProductId(HttpServletRequest request) {

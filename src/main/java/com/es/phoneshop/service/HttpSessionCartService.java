@@ -37,19 +37,34 @@ public class HttpSessionCartService implements CartService {
     public synchronized void add(Cart cart, Long productId, int quantity) throws OutOfStockException {
         Product product = productDao.getProduct(productId);
 
-        List<CartItem> items = cart.getItems();
-        Optional<CartItem> itemOptional = items.stream()
-                .filter(item -> productId.equals(item.getProduct().getId()))
-                .findAny();
+        Optional<CartItem> itemOptional = findCartItemForUpdate(cart, productId, quantity);
+        int existingProductsAmount = itemOptional.map(CartItem::getQuantity).orElse(0);
+
+        checkStockAvailable(product, existingProductsAmount + quantity);
 
         if (itemOptional.isPresent()) {
             CartItem item = itemOptional.get();
             quantity += item.getQuantity();
 
-            checkStockAvailable(product, quantity);
             item.setQuantity(quantity);
         } else {
-            checkStockAvailable(product, quantity);
+            cart.getItems().add(new CartItem(product, quantity));
+        }
+    }
+
+    @Override
+    public synchronized void update(Cart cart, Long productId, int quantity) throws OutOfStockException {
+        Product product = productDao.getProduct(productId);
+
+        checkStockAvailable(product, quantity);
+
+        Optional<CartItem> itemOptional = findCartItemForUpdate(cart, productId, quantity);
+
+        if (itemOptional.isPresent()) {
+            CartItem item = itemOptional.get();
+
+            item.setQuantity(quantity);
+        } else {
             cart.getItems().add(new CartItem(product, quantity));
         }
     }
@@ -58,5 +73,16 @@ public class HttpSessionCartService implements CartService {
         if (product.getStock() < quantity) {
             throw new OutOfStockException(product, quantity, product.getStock());
         }
+    }
+
+    private Optional<CartItem> findCartItemForUpdate(Cart cart, Long productId, int quantity) throws OutOfStockException {
+        Product product = productDao.getProduct(productId);
+
+        List<CartItem> items = cart.getItems();
+        Optional<CartItem> itemOptional = items.stream()
+                .filter(item -> productId.equals(item.getProduct().getId()))
+                .findAny();
+
+        return itemOptional;
     }
 }

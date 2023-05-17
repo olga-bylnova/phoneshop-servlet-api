@@ -67,7 +67,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
             doGet(request, response);
             return;
         }
-        //response.sendRedirect(request.getContextPath() + "/products/" + productId);
+
         request.setAttribute("message", "Product added to cart");
         doGet(request, response);
     }

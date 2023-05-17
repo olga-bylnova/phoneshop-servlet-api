@@ -21,7 +21,7 @@
         </p>
     </c:if>
     <p>${product.description}</p>
-    <form method="post">
+    <form method="post" action="${pageContext.servletContext.contextPath}/products/${product.id}">
         <table>
             <tr>
                 <td>Image</td>

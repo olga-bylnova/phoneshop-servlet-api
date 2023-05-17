@@ -5,20 +5,18 @@
 
 <jsp:useBean id="cart" type="com.es.phoneshop.model.cart.Cart" scope="request"/>
 <tags:master pageTitle="Cart Page">
-    <c:if test="${not empty message}">
+    <c:if test="${not empty param.message}">
         <p class="success">
-                ${message}
+                ${param.message}
         </p>
     </c:if>
-    <c:if test="${not empty error}">
+    <c:if test="${not empty errors}">
         <p class="error">
-            There was an error adding to cart
-            <br/>
-                ${error}
+            There was an error updating cart
         </p>
     </c:if>
     <c:if test="${not empty cart.items}">
-        <form method="post">
+        <form method="post" action="${pageContext.servletContext.contextPath}/cart">
             <table>
                 <thead>
                 <tr>
@@ -34,7 +32,7 @@
                     </td>
                 </tr>
                 </thead>
-                <c:forEach var="item" items="${cart.items}">
+                <c:forEach var="item" items="${cart.items}" varStatus="status">
                     <tr>
                         <td>
                             <img class="product-tile" src="${item.product.imageUrl}">
@@ -45,7 +43,15 @@
                         </td>
                         <td class="quantity">
                             <fmt:formatNumber value="${item.quantity}" var="quantity"/>
-                            <input name="quantity" value="${quantity}" class="quantity"/>
+                            <c:set var="error" value="${errors[item.product.id]}"/>
+                            <input name="quantity"
+                                   value="${not empty error ? paramValues['quantity'][status.index] : item.quantity}"
+                                   class="quantity"/>
+                            <c:if test="${not empty error}">
+                                <p class="error">
+                                        ${error}
+                                </p>
+                            </c:if>
                             <input name="productId" value="${item.product.id}" type="hidden"/>
                         </td>
                         <td class="price">
