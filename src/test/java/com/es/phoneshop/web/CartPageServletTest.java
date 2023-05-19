@@ -1,11 +1,8 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.dao.ProductDao;
 import com.es.phoneshop.exception.OutOfStockException;
 import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.model.product.ProductReview;
 import com.es.phoneshop.service.CartService;
-import com.es.phoneshop.service.ProductService;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +21,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProductListPageServletTest {
+public class CartPageServletTest {
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -32,34 +29,29 @@ public class ProductListPageServletTest {
     @Mock
     private RequestDispatcher requestDispatcher;
     @Mock
-    private ProductService productService;
-    @Mock
-    private ProductDao productDao;
-    @Mock
     private CartService cartService;
     @InjectMocks
-    private ProductListPageServlet servlet = new ProductListPageServlet();
-    private static final String validProductIdParameter = "11";
-    private static final String validQuantityParameter = "11";
+    private CartPageServlet servlet = new CartPageServlet();
+    private static final String[] validProductIds = new String[]{"1"};
+    private static final String[] validQuantities = new String[]{"1"};
+    private static final String[] invalidQuantities = new String[]{"asdf"};
+    private static final String CART_JSP = "/WEB-INF/pages/cart.jsp";
 
     @Before
-    public void setup() {
-        when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
-        when(productService.getRecentlyReviewedProducts(any())).thenReturn(new ProductReview());
+    public void init() {
+        when(request.getParameterValues("productId")).thenReturn(validProductIds);
+        when(request.getParameterValues("quantity")).thenReturn(validQuantities);
 
-        when(request.getParameter("productId")).thenReturn(validProductIdParameter);
+        when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
         when(request.getLocale()).thenReturn(Locale.US);
-        when(request.getParameter("quantity")).thenReturn(validQuantityParameter);
     }
 
     @Test
     public void testDoGet() throws ServletException, IOException {
         servlet.doGet(request, response);
 
-        verify(request).getRequestDispatcher(eq("/WEB-INF/pages/productList.jsp"));
-        verify(requestDispatcher).forward(request, response);
-        verify(request).setAttribute(eq("products"), any());
-        verify(request).setAttribute(eq("productReview"), any());
+        verify(request).setAttribute(eq("cart"), any());
+        verify(request).getRequestDispatcher(eq(CART_JSP));
     }
 
     @Test
@@ -71,7 +63,7 @@ public class ProductListPageServletTest {
 
     @Test
     public void testDoPostWhenQuantityNotANumber() throws ServletException, IOException {
-        when(request.getParameter("quantity")).thenReturn("asf");
+        when(request.getParameterValues("quantity")).thenReturn(invalidQuantities);
 
         servlet.doPost(request, response);
 
@@ -79,8 +71,8 @@ public class ProductListPageServletTest {
     }
 
     @Test
-    public void testDoPostWhenQuantityOutOfStock() throws ServletException, IOException, OutOfStockException {
-        doThrow(new OutOfStockException(new Product(), 0, 0)).when(cartService).add(any(), anyLong(), anyInt());
+    public void testDoPostWhenProductOutOfStock() throws ServletException, IOException, OutOfStockException {
+        doThrow(new OutOfStockException(new Product(), 0, 0)).when(cartService).update(any(), anyLong(), anyInt());
 
         servlet.doPost(request, response);
 

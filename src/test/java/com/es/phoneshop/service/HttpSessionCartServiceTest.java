@@ -23,10 +23,10 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpSessionCartServiceTest {
-
     private CartService cartService;
     private Product product;
     private Cart cart;
+    private static final Long productId = 1L;
     private ProductDao productDao;
     @Mock
     private HttpServletRequest request;
@@ -37,8 +37,16 @@ public class HttpSessionCartServiceTest {
     public void setUp() {
         cartService = HttpSessionCartService.getInstance();
         productDao = ArrayListProductDao.getInstance();
-        product = new Product(1L, "htces4g", "HTC EVO Shift 4G", new BigDecimal(320), Currency.getInstance("USD"), 3, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/HTC/HTC%20EVO%20Shift%204G.jpg");
+        product = new Product(productId, "htces4g", "HTC EVO Shift 4G", new BigDecimal(320), Currency.getInstance("USD"), 3, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/HTC/HTC%20EVO%20Shift%204G.jpg");
+
+        productDao.save(product);
+    }
+
+    @Before
+    public void fillCart() {
         cart = new Cart();
+
+        cart.getItems().add(new CartItem(product, 2));
     }
 
     @Test
@@ -50,10 +58,10 @@ public class HttpSessionCartServiceTest {
 
     @Test
     public void testAddToCartValidQuantity() throws OutOfStockException {
-        int quantity = 3;
-        productDao.save(product);
+        Cart cart = new Cart();
+        int quantity = 1;
 
-        cartService.add(cart, 1L, quantity);
+        cartService.add(cart, productId, quantity);
 
         assertTrue(cart.getItems()
                 .stream()
@@ -63,21 +71,15 @@ public class HttpSessionCartServiceTest {
     @Test(expected = OutOfStockException.class)
     public void testAddToCartQuantityOutOfStockThrowsOutOfStockException() throws OutOfStockException {
         int quantity = 5;
-        productDao.save(product);
 
-        cartService.add(cart, 1L, quantity);
+        cartService.add(cart, productId, quantity);
     }
 
     @Test
     public void testAddToCartProductExistsInCart() throws OutOfStockException {
-        Cart cart = new Cart();
         int sumQuantity = 3;
-        CartItem cartItem = new CartItem(product, 2);
 
-        cart.getItems().add(cartItem);
-        productDao.save(product);
-
-        cartService.add(cart, 1L, 1);
+        cartService.add(cart, productId, 1);
 
         assertTrue(cart.getItems()
                 .stream()
@@ -86,12 +88,52 @@ public class HttpSessionCartServiceTest {
 
     @Test(expected = OutOfStockException.class)
     public void testAddToCartProductExistsInCartQuantityOutOfStockThrowOutOfStockException() throws OutOfStockException {
+        cartService.add(cart, productId, 3);
+    }
+
+    @Test
+    public void testUpdateWhenProductIsInCart() throws OutOfStockException {
+        int newQuantity = 3;
+
+        cartService.update(cart, productId, newQuantity);
+
+        assertTrue(cart.getItems()
+                .stream()
+                .anyMatch(item -> productId.equals(item.getProduct().getId())
+                        && newQuantity == item.getQuantity()));
+    }
+
+    @Test(expected = OutOfStockException.class)
+    public void testUpdateWhenProductIsInCartQuantityOutOfStockThrowOutOfStockException() throws OutOfStockException {
+        int newQuantity = 4;
+
+        cartService.update(cart, productId, newQuantity);
+
+        assertTrue(cart.getItems()
+                .stream()
+                .anyMatch(item -> productId.equals(item.getProduct().getId())
+                        && newQuantity == item.getQuantity()));
+    }
+
+    @Test
+    public void testUpdateWhenProductIsNotInCartThenCreateProductInCart() throws OutOfStockException {
         Cart cart = new Cart();
-        CartItem cartItem = new CartItem(product, 2);
+        int newQuantity = 3;
 
-        cart.getItems().add(cartItem);
-        productDao.save(product);
+        cartService.update(cart, productId, newQuantity);
 
-        cartService.add(cart, 1L, 3);
+        assertTrue(cart.getItems()
+                .stream()
+                .anyMatch(item -> productId.equals(item.getProduct().getId())
+                        && newQuantity == item.getQuantity()));
+    }
+
+    @Test
+    public void testDelete() {
+        cartService.delete(cart, productId);
+
+        assertTrue(cart.getItems()
+                .stream()
+                .noneMatch(item -> productId.equals(item.getProduct().getId())));
     }
 }
