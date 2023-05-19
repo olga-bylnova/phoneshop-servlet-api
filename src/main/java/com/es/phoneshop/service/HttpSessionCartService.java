@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class HttpSessionCartService implements CartService {
     private static final String CART_SESSION_ATTRIBUTE = HttpSessionCartService.class.getName() + ".cart";
@@ -39,7 +38,7 @@ public class HttpSessionCartService implements CartService {
     public synchronized void add(Cart cart, Long productId, int quantity) throws OutOfStockException {
         Product product = productDao.getProduct(productId);
 
-        Optional<CartItem> itemOptional = findCartItemForUpdate(cart, productId, quantity);
+        Optional<CartItem> itemOptional = findCartItemForUpdate(cart, productId);
         int existingProductsAmount = itemOptional.map(CartItem::getQuantity).orElse(0);
 
         checkStockAvailable(product, existingProductsAmount + quantity);
@@ -61,7 +60,7 @@ public class HttpSessionCartService implements CartService {
 
         checkStockAvailable(product, quantity);
 
-        Optional<CartItem> itemOptional = findCartItemForUpdate(cart, productId, quantity);
+        Optional<CartItem> itemOptional = findCartItemForUpdate(cart, productId);
 
         if (itemOptional.isPresent()) {
             CartItem item = itemOptional.get();
@@ -87,7 +86,7 @@ public class HttpSessionCartService implements CartService {
         }
     }
 
-    private Optional<CartItem> findCartItemForUpdate(Cart cart, Long productId, int quantity) throws OutOfStockException {
+    private Optional<CartItem> findCartItemForUpdate(Cart cart, Long productId) {
         List<CartItem> items = cart.getItems();
 
         return items.stream()

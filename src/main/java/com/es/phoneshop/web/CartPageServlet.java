@@ -1,14 +1,8 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.dao.ArrayListProductDao;
-import com.es.phoneshop.dao.ProductDao;
 import com.es.phoneshop.exception.OutOfStockException;
-import com.es.phoneshop.model.cart.Cart;
-import com.es.phoneshop.model.product.ProductReview;
 import com.es.phoneshop.service.CartService;
 import com.es.phoneshop.service.HttpSessionCartService;
-import com.es.phoneshop.service.HttpSessionProductService;
-import com.es.phoneshop.service.ProductService;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -23,16 +17,12 @@ import java.util.Map;
 
 public class CartPageServlet extends HttpServlet {
     private static final String CART_JSP = "/WEB-INF/pages/cart.jsp";
-    private ProductDao productDao;
     private CartService cartService;
-    private ProductService productService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        productDao = ArrayListProductDao.getInstance();
         cartService = HttpSessionCartService.getInstance();
-        productService = HttpSessionProductService.getInstance();
     }
 
     @Override
@@ -57,7 +47,6 @@ public class CartPageServlet extends HttpServlet {
                 cartService.update(cartService.getCart(request), productId, quantity);
             } catch (ParseException | OutOfStockException e) {
                 handleError(errors, productId, e);
-                errors.put(productId, "Not a number");
             }
         }
 
@@ -75,11 +64,6 @@ public class CartPageServlet extends HttpServlet {
         } else {
             errors.put(productId, "Out of stock, max available " + ((OutOfStockException) e).getStockAvailable());
         }
-    }
-
-    private Long parseProductId(HttpServletRequest request) {
-        String productId = request.getPathInfo();
-        return Long.parseLong(productId.substring(1));
     }
 
     private int getQuantity(HttpServletRequest request, String quantityString) throws ParseException {

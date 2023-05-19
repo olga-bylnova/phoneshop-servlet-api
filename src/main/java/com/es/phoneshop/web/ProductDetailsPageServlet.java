@@ -68,8 +68,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
             return;
         }
 
-        request.setAttribute("message", "Product added to cart");
-        doGet(request, response);
+        response.sendRedirect(request.getContextPath() + "/products/" + productId + "?message=Product added to cart successfully");
     }
 
     private Long parseProductId(HttpServletRequest request) {

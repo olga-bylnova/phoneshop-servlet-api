@@ -10,6 +10,16 @@
     <p>
         Welcome to Expert-Soft training!
     </p>
+    <c:if test="${not empty param.message}">
+        <p class="success">
+                ${param.message}
+        </p>
+    </c:if>
+    <c:if test="${not empty errors}">
+        <p class="error">
+            There was an error updating cart
+        </p>
+    </c:if>
     <form>
         <input name="query" value="${param.query}">
         <button>Search</button>
@@ -23,14 +33,16 @@
                 <tags:sortLink sort="description" order="asc"/>
                 <tags:sortLink sort="description" order="desc"/>
             </td>
+            <td>Quantity</td>
             <td class="price">
                 Price
                 <tags:sortLink sort="price" order="asc"/>
                 <tags:sortLink sort="price" order="desc"/>
             </td>
+            <td/>
         </tr>
         </thead>
-        <c:forEach var="product" items="${products}">
+        <c:forEach var="product" items="${products}" varStatus="status">
             <tr>
                 <td>
                     <img class="product-tile" src="${product.imageUrl}">
@@ -38,6 +50,21 @@
                 <td>
                     <a href="${pageContext.servletContext.contextPath}/products/${product.id}">
                             ${product.description}</a>
+                </td>
+                <td class="quantity">
+                    <form id="addToCart${product.id}" action="${pageContext.servletContext.contextPath}/products" method="post">
+                        <fmt:formatNumber value="1" var="quantity"/>
+                        <c:set var="error" value="${errors[product.id]}"/>
+                        <input name="quantity"
+                               value="${not empty error ? paramValues['quantity'][status.index] : 1}"
+                               class="quantity"/>
+                        <c:if test="${not empty error}">
+                            <p class="error">
+                                    ${error}
+                            </p>
+                        </c:if>
+                        <input name="productId" value="${product.id}" type="hidden"/>
+                    </form>
                 </td>
                 <td class="price">
                     <a href="#" id="price/${product.id}">
@@ -65,6 +92,9 @@
                         <fmt:formatNumber value="${product.price}" type="currency"
                                           currencySymbol="${product.currency.symbol}"/>
                     </a>
+                </td>
+                <td>
+                    <button form="addToCart${product.id}">Add to cart</button>
                 </td>
             </tr>
         </c:forEach>
