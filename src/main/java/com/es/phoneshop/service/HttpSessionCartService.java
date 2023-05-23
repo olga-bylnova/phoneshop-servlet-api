@@ -110,4 +110,8 @@ public class HttpSessionCartService implements CartService {
         }
         cart.setTotalCost(totalCost);
     }
+
+    public void clearCart(HttpServletRequest request) {
+        request.getSession().setAttribute(CART_SESSION_ATTRIBUTE, new Cart());
+    }
 }

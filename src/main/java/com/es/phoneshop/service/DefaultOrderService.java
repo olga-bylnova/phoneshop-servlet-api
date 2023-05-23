@@ -1,21 +1,16 @@
 package com.es.phoneshop.service;
 
 import com.es.phoneshop.dao.ArrayListOrderDao;
-import com.es.phoneshop.dao.ArrayListProductDao;
 import com.es.phoneshop.dao.OrderDao;
-import com.es.phoneshop.dao.ProductDao;
-import com.es.phoneshop.exception.OutOfStockException;
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartItem;
 import com.es.phoneshop.model.order.Order;
 import com.es.phoneshop.model.order.PaymentMethod;
-import com.es.phoneshop.model.product.Product;
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class DefaultOrderService implements OrderService {
@@ -60,6 +55,7 @@ public class DefaultOrderService implements OrderService {
 
     @Override
     public void placeOrder(Order order) {
+        order.setSecureId(UUID.randomUUID().toString());
         orderDao.save(order);
     }
 }

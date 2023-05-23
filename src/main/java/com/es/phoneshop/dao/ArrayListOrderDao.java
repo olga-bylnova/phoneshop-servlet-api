@@ -24,13 +24,26 @@ public class ArrayListOrderDao implements OrderDao {
     }
 
     @Override
+    public Order getOrderBySecureId(String id) {
+        try {
+            lock.readLock().lock();
+            return orders.stream()
+                    .filter(order -> id != null && id.equals(order.getSecureId()))
+                    .findAny()
+                    .orElseThrow(() -> new OrderNotFoundException(id));
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    @Override
     public Order getOrder(Long id) {
         try {
             lock.readLock().lock();
             return orders.stream()
                     .filter(order -> id != null && id.equals(order.getId()))
                     .findAny()
-                    .orElseThrow(() -> new OrderNotFoundException(id));
+                    .orElseThrow(() -> new OrderNotFoundException(id.toString()));
         } finally {
             lock.readLock().unlock();
         }
