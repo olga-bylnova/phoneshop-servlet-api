@@ -76,6 +76,15 @@
     <servlet-name>orderOverview</servlet-name>
     <url-pattern>/order/overview/*</url-pattern>
   </servlet-mapping>
+
+  <filter>
+    <filter-name>dosFilter</filter-name>
+    <filter-class>com.es.phoneshop.web.filter.DosFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>dosFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
   
   <error-page>
     <location>/WEB-INF/pages/errorProductNotFound.jsp</location>
@@ -95,6 +104,11 @@
   <error-page>
     <location>/WEB-INF/pages/error.jsp</location>
     <error-code>404</error-code>
+  </error-page>
+
+  <error-page>
+    <location>/WEB-INF/pages/errorTooManyRequests.jsp</location>
+    <error-code>429</error-code>
   </error-page>
 
 </web-app>
