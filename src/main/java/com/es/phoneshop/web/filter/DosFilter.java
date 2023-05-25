@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class DosFilter implements Filter {
     private static final String ERROR_PAGE = "/WEB-INF/pages/errorTooManyRequests.jsp";
-    private static DosProtectionService dosProtectionService;
+    private DosProtectionService dosProtectionService;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
