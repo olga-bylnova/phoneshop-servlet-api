@@ -43,7 +43,7 @@ public class ArrayListOrderDao implements OrderDao {
             return orders.stream()
                     .filter(order -> id != null && id.equals(order.getId()))
                     .findAny()
-                    .orElseThrow(() -> new OrderNotFoundException(id.toString()));
+                    .orElseThrow(() -> new OrderNotFoundException(id == null ? null : id.toString()));
         } finally {
             lock.readLock().unlock();
         }

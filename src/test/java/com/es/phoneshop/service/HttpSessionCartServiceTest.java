@@ -19,6 +19,9 @@ import java.util.Currency;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -40,6 +43,8 @@ public class HttpSessionCartServiceTest {
         product = new Product(productId, "htces4g", "HTC EVO Shift 4G", new BigDecimal(320), Currency.getInstance("USD"), 3, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/HTC/HTC%20EVO%20Shift%204G.jpg");
 
         productDao.save(product);
+
+        when(request.getSession()).thenReturn(session);
     }
 
     @Before
@@ -51,8 +56,6 @@ public class HttpSessionCartServiceTest {
 
     @Test
     public void testGetCart() {
-        when(request.getSession()).thenReturn(session);
-
         assertNotNull(cartService.getCart(request));
     }
 
@@ -135,5 +138,12 @@ public class HttpSessionCartServiceTest {
         assertTrue(cart.getItems()
                 .stream()
                 .noneMatch(item -> productId.equals(item.getProduct().getId())));
+    }
+
+    @Test
+    public void testClearCart() {
+        cartService.clearCart(request);
+
+        verify(session).setAttribute(anyString(), any());
     }
 }

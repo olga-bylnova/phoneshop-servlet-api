@@ -84,6 +84,18 @@ public class Order extends Cart {
         this.paymentMethod = paymentMethod;
     }
 
+    public Order() {}
+    public Order(BigDecimal subTotal, BigDecimal deliveryCost, String firstName, String lastName, String phone, LocalDate deliveryDate, String deliveryAddress, PaymentMethod paymentMethod) {
+        this.subTotal = subTotal;
+        this.deliveryCost = deliveryCost;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.deliveryDate = deliveryDate;
+        this.deliveryAddress = deliveryAddress;
+        this.paymentMethod = paymentMethod;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
