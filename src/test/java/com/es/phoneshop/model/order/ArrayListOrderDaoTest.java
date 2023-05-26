@@ -2,6 +2,7 @@ package com.es.phoneshop.model.order;
 
 import com.es.phoneshop.dao.ArrayListOrderDao;
 import com.es.phoneshop.dao.OrderDao;
+import com.es.phoneshop.exception.EntityNotFoundException;
 import com.es.phoneshop.exception.OrderNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,12 +29,12 @@ public class ArrayListOrderDaoTest {
     public void whenGetOrderById() {
         orderDao.save(order);
 
-        assertNotNull(orderDao.getOrder(order.getId()));
+        assertNotNull(orderDao.getItem(order.getId()));
     }
 
-    @Test(expected = OrderNotFoundException.class)
+    @Test(expected = EntityNotFoundException.class)
     public void givenNullWhenGetOrderThenThrowOrderNotFoundException() {
-        orderDao.getOrder(null);
+        orderDao.getItem(null);
     }
 
     @Test
@@ -65,7 +66,7 @@ public class ArrayListOrderDaoTest {
         order.setTotalCost(newTotalCost);
         orderDao.save(order);
 
-        assertEquals(newTotalCost, orderDao.getOrder(order.getId()).getTotalCost());
+        assertEquals(newTotalCost, orderDao.getItem(order.getId()).getTotalCost());
     }
 
     @Test

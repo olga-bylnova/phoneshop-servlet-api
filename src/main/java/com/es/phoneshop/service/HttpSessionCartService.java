@@ -36,7 +36,7 @@ public class HttpSessionCartService implements CartService {
 
     @Override
     public synchronized void add(Cart cart, Long productId, int quantity) throws OutOfStockException {
-        Product product = productDao.getProduct(productId);
+        Product product = productDao.getItem(productId);
 
         Optional<CartItem> itemOptional = findCartItemForUpdate(cart, productId);
         int existingProductsAmount = itemOptional.map(CartItem::getQuantity).orElse(0);
@@ -56,7 +56,7 @@ public class HttpSessionCartService implements CartService {
 
     @Override
     public synchronized void update(Cart cart, Long productId, int quantity) throws OutOfStockException {
-        Product product = productDao.getProduct(productId);
+        Product product = productDao.getItem(productId);
 
         checkStockAvailable(product, quantity);
 

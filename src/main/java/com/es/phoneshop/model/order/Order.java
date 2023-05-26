@@ -1,11 +1,12 @@
 package com.es.phoneshop.model.order;
 
 import com.es.phoneshop.model.cart.Cart;
+import com.es.phoneshop.model.generic.Entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Order extends Cart {
+public class Order extends Cart implements Entity {
     private Long id;
     private String secureId;
     private BigDecimal subTotal;

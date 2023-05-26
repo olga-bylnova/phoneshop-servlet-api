@@ -37,7 +37,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
         Long productId = parseProductId(request);
         ProductReview productReview = productService.getRecentlyReviewedProducts(request);
 
-        request.setAttribute("product", productDao.getProduct(productId));
+        request.setAttribute("product", productDao.getItem(productId));
         request.setAttribute("cart", cartService.getCart(request));
         request.setAttribute("productReview", productReview);
 

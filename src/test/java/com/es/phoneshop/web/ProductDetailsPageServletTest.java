@@ -56,7 +56,7 @@ public class ProductDetailsPageServletTest {
     @Test
     public void testDoGet() throws ServletException, IOException {
         when(request.getPathInfo()).thenReturn(validProductId);
-        when(productDao.getProduct(any())).thenReturn(new Product());
+        when(productDao.getItem(any())).thenReturn(new Product());
 
         servlet.doGet(request, response);
 

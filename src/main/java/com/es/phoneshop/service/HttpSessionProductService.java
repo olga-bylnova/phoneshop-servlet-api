@@ -34,7 +34,7 @@ public class HttpSessionProductService implements ProductService {
 
     @Override
     public synchronized void updateRecentlyReviewedProducts(List<Product> recentProducts, Long productId, HttpServletRequest request) {
-        Product product = productDao.getProduct(productId);
+        Product product = productDao.getItem(productId);
 
         recentProducts.removeIf(product1 -> product1.getId().equals(productId));
         recentProducts.add(0, product);
