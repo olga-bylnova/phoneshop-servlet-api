@@ -4,6 +4,4 @@
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 
 <jsp:useBean id="cart" type="com.es.phoneshop.model.cart.Cart" scope="request"/>
-<c:if test="${not empty cart.items}">
-    Cart: ${cart.totalQuantity} items, ${cart.totalCost}$ total
-</c:if>
+${cart.totalQuantity} items, ${cart.totalCost eq null ? 0 : cart.totalCost}$ total
