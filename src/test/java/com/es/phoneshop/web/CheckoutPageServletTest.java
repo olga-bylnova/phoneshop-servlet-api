@@ -55,12 +55,13 @@ public class CheckoutPageServletTest {
     @Test
     public void testDoPostWhenValidParameters() throws ServletException, IOException {
         String testString = "test";
+        String testPhoneString = "+1";
         String testDateString = "2020-01-01";
         String testPaymentMethodString = "CASH";
 
         when(request.getParameter("firstName")).thenReturn(testString);
         when(request.getParameter("lastName")).thenReturn(testString);
-        when(request.getParameter("phone")).thenReturn(testString);
+        when(request.getParameter("phone")).thenReturn(testPhoneString);
         when(request.getParameter("deliveryAddress")).thenReturn(testString);
         when(request.getParameter("deliveryDate")).thenReturn(testDateString);
         when(request.getParameter("paymentMethod")).thenReturn(testPaymentMethodString);

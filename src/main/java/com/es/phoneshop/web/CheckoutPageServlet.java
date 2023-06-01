@@ -15,9 +15,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 public class CheckoutPageServlet extends HttpServlet {
     private static final String CHECKOUT_JSP = "/WEB-INF/pages/checkout.jsp";
@@ -53,6 +55,7 @@ public class CheckoutPageServlet extends HttpServlet {
         setRequiredParameter(request, "phone", errors, order::setPhone);
         setRequiredParameter(request, "deliveryAddress", errors, order::setDeliveryAddress);
 
+        setPhoneNumber(request, errors, order);
         setDeliveryDate(request, errors, order);
         setPaymentMethod(request, errors, order);
 
@@ -66,6 +69,22 @@ public class CheckoutPageServlet extends HttpServlet {
             request.setAttribute("paymentMethods", orderService.getPaymentMethods());
 
             request.getRequestDispatcher(CHECKOUT_JSP).forward(request, response);
+        }
+    }
+
+    private void setPhoneNumber(HttpServletRequest request,
+                                Map<String, String> errors,
+                                Order order) {
+        String value = request.getParameter("phone");
+        if (value == null || value.isEmpty()) {
+            errors.put("phone", "Value is required");
+        } else {
+            String pattern = "^[\\+]?\\d+";
+            if (Pattern.matches(pattern, value)) {
+                order.setPhone(value);
+            } else {
+                errors.put("phone", "Incorrect phone input");
+            }
         }
     }
 
@@ -93,13 +112,17 @@ public class CheckoutPageServlet extends HttpServlet {
     }
 
     private void setDeliveryDate(HttpServletRequest request,
-                                  Map<String, String> errors,
-                                  Order order) {
+                                 Map<String, String> errors,
+                                 Order order) {
         String value = request.getParameter("deliveryDate");
         if (value == null || value.isEmpty()) {
             errors.put("deliveryDate", "Value is required");
         } else {
-            order.setDeliveryDate(LocalDate.parse(value));
+            try {
+                order.setDeliveryDate(LocalDate.parse(value));
+            } catch (DateTimeParseException e) {
+                errors.put("deliveryDate", "Incorrect date input");
+            }
         }
     }
 }

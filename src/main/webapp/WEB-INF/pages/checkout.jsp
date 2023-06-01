@@ -82,6 +82,7 @@
                     <td>
                         <c:set var="error" value="${errors['deliveryDate']}"/>
                         <input id="deliveryDate" name="deliveryDate" type="date"
+                               placeholder="DD/MM/YYYY"
                                value="${order.deliveryDate.toString()}">
                         <c:if test="${not empty error}">
                             <p class="error">
