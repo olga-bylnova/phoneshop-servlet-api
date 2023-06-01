@@ -3,6 +3,7 @@ package com.es.phoneshop.web;
 import com.es.phoneshop.dao.ArrayListProductDao;
 import com.es.phoneshop.dao.ProductDao;
 import com.es.phoneshop.exception.OutOfStockException;
+import com.es.phoneshop.exception.QuantityNotIntegerException;
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.product.SortField;
 import com.es.phoneshop.model.product.SortOrder;
@@ -17,11 +18,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.es.phoneshop.util.ErrorHandler.handleError;
+import static com.es.phoneshop.util.QuantityParser.getQuantity;
+
 public class ProductListPageServlet extends HttpServlet {
     private ProductDao productDao;
     private ProductService productService;
@@ -57,12 +61,11 @@ public class ProductListPageServlet extends HttpServlet {
 
         Map<Long, String> errors = new HashMap<>();
         try {
-            NumberFormat format = NumberFormat.getInstance(request.getLocale());
-            quantity = format.parse(request.getParameter("quantity")).intValue();
+            quantity = getQuantity(request, request.getParameter("quantity"));
 
             Cart cart = cartService.getCart(request);
             cartService.add(cart, productId, quantity);
-        } catch (ParseException | OutOfStockException e) {
+        } catch (ParseException | OutOfStockException | QuantityNotIntegerException e) {
             handleError(errors, productId, e);
         }
 
@@ -71,14 +74,6 @@ public class ProductListPageServlet extends HttpServlet {
         } else {
             request.setAttribute("errors", errors);
             doGet(request, response);
-        }
-    }
-
-    private void handleError(Map<Long, String> errors, Long productId, Exception e) {
-        if (e.getClass().equals(ParseException.class)) {
-            errors.put(productId, "Not a number");
-        } else {
-            errors.put(productId, "Out of stock, max available " + ((OutOfStockException) e).getStockAvailable());
         }
     }
 }
