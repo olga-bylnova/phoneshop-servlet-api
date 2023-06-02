@@ -2,6 +2,7 @@ package com.es.phoneshop.model.product;
 
 import com.es.phoneshop.dao.ArrayListProductDao;
 import com.es.phoneshop.dao.ProductDao;
+import com.es.phoneshop.exception.EntityNotFoundException;
 import com.es.phoneshop.exception.ProductNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,12 +65,12 @@ public class ArrayListProductDaoTest {
     public void whenGetProduct() {
         productDao.save(product);
 
-        assertNotNull(productDao.getProduct(product.getId()));
+        assertNotNull(productDao.getItem(product.getId()));
     }
 
-    @Test(expected = ProductNotFoundException.class)
+    @Test(expected = EntityNotFoundException.class)
     public void givenNullWhenGetProductThenThrowProductNotFoundException() {
-        productDao.getProduct(null);
+        productDao.getItem(null);
     }
 
     @Test
@@ -100,16 +101,16 @@ public class ArrayListProductDaoTest {
         product.setDescription(newDescription);
         productDao.save(product);
 
-        assertEquals(newDescription, productDao.getProduct(product.getId()).getDescription());
+        assertEquals(newDescription, productDao.getItem(product.getId()).getDescription());
     }
 
-    @Test(expected = ProductNotFoundException.class)
+    @Test(expected = EntityNotFoundException.class)
     public void givenIdWhenDeleteThenDeleteProduct() {
         productDao.save(product);
 
         productDao.delete(product.getId());
 
-        productDao.getProduct(product.getId());
+        productDao.getItem(product.getId());
     }
 
     @Test

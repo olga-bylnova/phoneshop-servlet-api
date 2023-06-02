@@ -1,9 +1,12 @@
 package com.es.phoneshop.model.product;
 
+import com.es.phoneshop.model.generic.Entity;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class Product {
+public class Product implements Serializable, Entity {
     private Long id;
     private String code;
     private String description;

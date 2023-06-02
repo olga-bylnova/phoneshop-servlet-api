@@ -8,6 +8,7 @@ import com.es.phoneshop.model.cart.CartItem;
 import com.es.phoneshop.model.product.Product;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,28 +36,82 @@ public class HttpSessionCartService implements CartService {
 
     @Override
     public synchronized void add(Cart cart, Long productId, int quantity) throws OutOfStockException {
-        Product product = productDao.getProduct(productId);
+        Product product = productDao.getItem(productId);
 
-        List<CartItem> items = cart.getItems();
-        Optional<CartItem> itemOptional = items.stream()
-                .filter(item -> productId.equals(item.getProduct().getId()))
-                .findAny();
+        Optional<CartItem> itemOptional = findCartItemForUpdate(cart, productId);
+        int existingProductsAmount = itemOptional.map(CartItem::getQuantity).orElse(0);
+
+        checkStockAvailable(product, existingProductsAmount + quantity);
 
         if (itemOptional.isPresent()) {
             CartItem item = itemOptional.get();
             quantity += item.getQuantity();
 
-            checkStockAvailable(product, quantity);
             item.setQuantity(quantity);
         } else {
-            checkStockAvailable(product, quantity);
             cart.getItems().add(new CartItem(product, quantity));
         }
+        recalculateCart(cart);
+    }
+
+    @Override
+    public synchronized void update(Cart cart, Long productId, int quantity) throws OutOfStockException {
+        Product product = productDao.getItem(productId);
+
+        checkStockAvailable(product, quantity);
+
+        Optional<CartItem> itemOptional = findCartItemForUpdate(cart, productId);
+
+        if (itemOptional.isPresent()) {
+            CartItem item = itemOptional.get();
+
+            item.setQuantity(quantity);
+        } else {
+            cart.getItems().add(new CartItem(product, quantity));
+        }
+        recalculateCart(cart);
+    }
+
+    @Override
+    public synchronized void delete(Cart cart, Long productId) {
+        cart.getItems().removeIf(item ->
+                productId.equals(item.getProduct().getId())
+        );
+        recalculateCart(cart);
     }
 
     private void checkStockAvailable(Product product, int quantity) throws OutOfStockException {
         if (product.getStock() < quantity) {
             throw new OutOfStockException(product, quantity, product.getStock());
         }
+    }
+
+    private Optional<CartItem> findCartItemForUpdate(Cart cart, Long productId) {
+        List<CartItem> items = cart.getItems();
+
+        return items.stream()
+                .filter(item -> productId.equals(item.getProduct().getId()))
+                .findAny();
+    }
+
+    private void recalculateCart(Cart cart) {
+        cart.setTotalQuantity(cart.getItems()
+                .stream()
+                .map(CartItem::getQuantity)
+                .mapToInt(q -> q)
+                .sum());
+
+        BigDecimal totalCost = BigDecimal.ZERO;
+        for (CartItem item : cart.getItems()) {
+            BigDecimal price = item.getProduct().getPrice();
+            int quantity = item.getQuantity();
+
+            totalCost = totalCost.add(price.multiply(BigDecimal.valueOf(quantity)));
+        }
+        cart.setTotalCost(totalCost);
+    }
+
+    public void clearCart(HttpServletRequest request) {
+        request.getSession().setAttribute(CART_SESSION_ATTRIBUTE, new Cart());
     }
 }

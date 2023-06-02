@@ -41,6 +41,7 @@ public class ProductDetailsPageServletTest {
     @InjectMocks
     private ProductDetailsPageServlet servlet = new ProductDetailsPageServlet();
     private static final String validProductId = "\\11";
+    public static final String PRODUCT_JSP = "/WEB-INF/pages/product.jsp";
 
     @Before
     public void init() {
@@ -55,16 +56,17 @@ public class ProductDetailsPageServletTest {
     @Test
     public void testDoGet() throws ServletException, IOException {
         when(request.getPathInfo()).thenReturn(validProductId);
-        when(productDao.getProduct(any())).thenReturn(new Product());
+        when(productDao.getItem(any())).thenReturn(new Product());
 
         servlet.doGet(request, response);
 
         verify(request).setAttribute(eq("product"), any());
         verify(request).setAttribute(eq("cart"), any());
         verify(request).setAttribute(eq("productReview"), any());
-        verify(request).getRequestDispatcher(eq("/WEB-INF/pages/product.jsp"));
+        verify(request).getRequestDispatcher(eq(PRODUCT_JSP));
         verify(requestDispatcher).forward(request, response);
     }
+
     @Test
     public void testDoPostWhenValidParameters() throws ServletException, IOException {
         when(request.getParameter("quantity")).thenReturn("1");
@@ -72,7 +74,6 @@ public class ProductDetailsPageServletTest {
         servlet.doPost(request, response);
 
         verify(request).getParameter("quantity");
-       // verify(request).setAttribute();
     }
 
     @Test

@@ -37,13 +37,13 @@ public class ProductDetailsPageServlet extends HttpServlet {
         Long productId = parseProductId(request);
         ProductReview productReview = productService.getRecentlyReviewedProducts(request);
 
-        request.setAttribute("product", productDao.getProduct(productId));
+        request.setAttribute("product", productDao.getItem(productId));
         request.setAttribute("cart", cartService.getCart(request));
         request.setAttribute("productReview", productReview);
 
-        productService.updateRecentlyReviewedProducts(productReview.getRecentProducts(), productId, request);
-
         request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
+
+        productService.updateRecentlyReviewedProducts(productReview.getRecentProducts(), productId, request);
     }
 
     @Override
@@ -67,7 +67,8 @@ public class ProductDetailsPageServlet extends HttpServlet {
             doGet(request, response);
             return;
         }
-        response.sendRedirect(request.getContextPath() + "/products/" + productId);
+
+        response.sendRedirect(request.getContextPath() + "/products/" + productId + "?message=Product added to cart successfully");
     }
 
     private Long parseProductId(HttpServletRequest request) {
