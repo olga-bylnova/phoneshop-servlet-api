@@ -1,6 +1,7 @@
 package com.es.phoneshop.web;
 
 import com.es.phoneshop.exception.OutOfStockException;
+import com.es.phoneshop.exception.QuantityNotIntegerException;
 import com.es.phoneshop.service.CartService;
 import com.es.phoneshop.service.HttpSessionCartService;
 import jakarta.servlet.ServletConfig;
@@ -10,10 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.es.phoneshop.util.ErrorHandler.handleError;
+import static com.es.phoneshop.util.QuantityParser.getQuantity;
 
 public class CartPageServlet extends HttpServlet {
     private static final String CART_JSP = "/WEB-INF/pages/cart.jsp";
@@ -45,7 +48,7 @@ public class CartPageServlet extends HttpServlet {
             try {
                 quantity = getQuantity(request, quantities[i]);
                 cartService.update(cartService.getCart(request), productId, quantity);
-            } catch (ParseException | OutOfStockException e) {
+            } catch (ParseException | OutOfStockException | QuantityNotIntegerException e) {
                 handleError(errors, productId, e);
             }
         }
@@ -58,16 +61,5 @@ public class CartPageServlet extends HttpServlet {
         }
     }
 
-    private void handleError(Map<Long, String> errors, Long productId, Exception e) {
-        if (e.getClass().equals(ParseException.class)) {
-            errors.put(productId, "Not a number");
-        } else {
-            errors.put(productId, "Out of stock, max available " + ((OutOfStockException) e).getStockAvailable());
-        }
-    }
 
-    private int getQuantity(HttpServletRequest request, String quantityString) throws ParseException {
-        NumberFormat format = NumberFormat.getInstance(request.getLocale());
-        return format.parse(quantityString).intValue();
-    }
 }
