@@ -60,6 +60,4 @@ public class CartPageServlet extends HttpServlet {
             doGet(request, response);
         }
     }
-
-
 }

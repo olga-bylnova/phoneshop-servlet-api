@@ -42,7 +42,7 @@
             <td/>
         </tr>
         </thead>
-        <c:forEach var="product" items="${products}" varStatus="status">
+        <c:forEach var="product" items="${products}">
             <tr>
                 <td>
                     <img class="product-tile" src="${product.imageUrl}">
@@ -56,7 +56,7 @@
                         <fmt:formatNumber value="1" var="quantity"/>
                         <c:set var="error" value="${errors[product.id]}"/>
                         <input name="quantity"
-                               value="${not empty error ? paramValues['quantity'][status.index] : 1}"
+                               value="${not empty error ? param.quantity: 1}"
                                class="quantity"/>
                         <c:if test="${not empty error}">
                             <p class="error">

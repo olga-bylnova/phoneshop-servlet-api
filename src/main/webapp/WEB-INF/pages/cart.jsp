@@ -46,7 +46,7 @@
                             <fmt:formatNumber value="${item.quantity}" var="quantity"/>
                             <c:set var="error" value="${errors[item.product.id]}"/>
                             <input name="quantity"
-                                   value="${not empty error ? paramValues['quantity'][status.index] : item.quantity}"
+                                   value="${item.quantity}"
                                    class="quantity"/>
                             <c:if test="${not empty error}">
                                 <p class="error">
@@ -79,8 +79,7 @@
             </p>
         </form>
         <form method="post" id="deleteCartItem"></form>
-        <form action="${pageContext.servletContext.contextPath}/checkout"
-        >
+        <form action="${pageContext.servletContext.contextPath}/checkout">
             <button>Checkout</button>
         </form>
     </c:if>

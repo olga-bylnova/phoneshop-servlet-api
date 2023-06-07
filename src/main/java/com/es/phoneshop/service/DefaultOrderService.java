@@ -38,7 +38,7 @@ public class DefaultOrderService implements OrderService {
                 })
                 .collect(Collectors.toList()));
         order.setSubTotal(cart.getTotalCost());
-        order.setDeliveryCost(calculateTotalCost());
+        order.setDeliveryCost(calculateDeliveryCost());
         order.setTotalCost(order.getSubTotal().add(order.getDeliveryCost()));
 
         return order;
@@ -49,7 +49,7 @@ public class DefaultOrderService implements OrderService {
         return Arrays.stream(PaymentMethod.values()).toList();
     }
 
-    private BigDecimal calculateTotalCost() {
+    private BigDecimal calculateDeliveryCost() {
         return new BigDecimal(5);
     }
 

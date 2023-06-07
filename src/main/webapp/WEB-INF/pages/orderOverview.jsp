@@ -68,7 +68,7 @@
             <tags:orderOverviewRow name="phone" order="${order}" label="Phone"/>
             <tags:orderOverviewRow name="deliveryAddress" order="${order}" label="Delivery address"/>
             <tr>
-                <td>Delivery Date</span></td>
+                <td>Delivery Date</td>
                 <td>
                         ${order.deliveryDate.toString()}
                 </td>
