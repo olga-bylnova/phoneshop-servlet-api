@@ -1,14 +1,25 @@
 package com.es.phoneshop.dao;
 
 import com.es.phoneshop.model.product.Product;
+import com.es.phoneshop.model.product.SearchCriteria;
 import com.es.phoneshop.model.product.SortField;
 import com.es.phoneshop.model.product.SortOrder;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductDao {
     Product getItem(Long id);
+
     List<Product> findProducts(String query, SortField sortField, SortOrder sortOrder);
+
     void save(Product product);
+
     void delete(Long id);
+
+    List<Product> findProductsByParameters(String description,
+                                           BigDecimal minPrice,
+                                           BigDecimal maxPrice,
+                                           SearchCriteria searchCriteria);
+
 }

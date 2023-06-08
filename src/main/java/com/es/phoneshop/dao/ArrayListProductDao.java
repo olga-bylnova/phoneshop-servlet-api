@@ -1,9 +1,11 @@
 package com.es.phoneshop.dao;
 
 import com.es.phoneshop.model.product.Product;
+import com.es.phoneshop.model.product.SearchCriteria;
 import com.es.phoneshop.model.product.SortField;
 import com.es.phoneshop.model.product.SortOrder;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -102,5 +104,50 @@ public class ArrayListProductDao extends GenericDao<Product> implements ProductD
         } finally {
             lock.writeLock().unlock();
         }
+    }
+
+    @Override
+    public List<Product> findProductsByParameters(String description,
+                                                  BigDecimal minPrice,
+                                                  BigDecimal maxPrice,
+                                                  SearchCriteria searchCriteria) {
+        try {
+            lock.readLock().lock();
+
+            List<String> searchKeywords = splitQuery(description);
+            Predicate<Product> matchesSearchCriteria;
+
+            if (searchCriteria == SearchCriteria.all_words) {
+                matchesSearchCriteria = getSearchCriteriaByAllWords(searchKeywords);
+            } else {
+                matchesSearchCriteria = getSearchCriteriaByAnyWords(searchKeywords);
+            }
+
+            return items.stream()
+                    .filter(product -> product.getPrice() != null)
+                    .filter(product -> product.getStock() > 0)
+                    .filter(product -> searchKeywords.isEmpty() || matchesSearchCriteria.test(product))
+                    .filter(product -> maxPrice == null || product.getPrice().compareTo(maxPrice) <= 0)
+                    .filter(product -> minPrice == null || product.getPrice().compareTo(minPrice) >= 0)
+                    .collect(Collectors.toList());
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    private Predicate<Product> getSearchCriteriaByAllWords(List<String> searchKeywords) {
+        return (product) -> searchKeywords
+                .stream()
+                .allMatch(keyword -> product.getDescription()
+                        .toLowerCase()
+                        .contains(keyword));
+    }
+
+    private Predicate<Product> getSearchCriteriaByAnyWords(List<String> searchKeywords) {
+        return (product) -> searchKeywords
+                .stream()
+                .anyMatch(keyword -> product.getDescription()
+                        .toLowerCase()
+                        .contains(keyword));
     }
 }

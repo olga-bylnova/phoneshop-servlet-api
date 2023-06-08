@@ -24,6 +24,9 @@
         <input name="query" value="${param.query}">
         <button>Search</button>
     </form>
+    <form action="${pageContext.servletContext.contextPath}/search">
+        <button>Advanced search</button>
+    </form>
     <table>
         <thead>
         <tr>
@@ -52,7 +55,8 @@
                             ${product.description}</a>
                 </td>
                 <td class="quantity">
-                    <form id="addToCart${product.id}" action="${pageContext.servletContext.contextPath}/products" method="post">
+                    <form id="addToCart${product.id}" action="${pageContext.servletContext.contextPath}/products"
+                          method="post">
                         <fmt:formatNumber value="1" var="quantity"/>
                         <c:set var="error" value="${errors[product.id]}"/>
                         <input name="quantity"
